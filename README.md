@@ -59,6 +59,14 @@ Render deployment:
 
 If Render logs show Python `3.14.x`, the service is using the wrong runtime. Redeploy after pushing this commit, or set `PYTHON_VERSION=3.12.10` manually in Render environment variables.
 
+If Render logs show `Running 'main.py'` and then `main.py: command not found`, the service Start Command is wrong in the Render dashboard. Go to Render -> Settings -> Start Command, delete `main.py`, and set:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+Then click Manual Deploy -> Clear build cache & deploy latest commit.
+
 ## Flutter Setup
 
 ```bash
