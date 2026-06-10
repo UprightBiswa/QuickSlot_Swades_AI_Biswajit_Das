@@ -32,8 +32,10 @@ Neon PostgreSQL:
 2. Use Postgres 17 or 18. Either is fine for this app.
 3. Choose the closest region to your demo laptop/users. For India, Singapore is usually better than US East.
 4. Do not enable Neon Auth for this hackathon unless asked. The requirement allows `X-User-Id`, so auth is intentionally light.
-5. Copy the SQLAlchemy connection URL into `quick_slot_backend/.env` as `DATABASE_URL=...`.
-6. Rotate/reset any database URL that was pasted into chat or committed by mistake.
+5. Copy the SQLAlchemy connection URL into `quick_slot_backend/.env` as `DATABASE_URL=...`, or paste it into Render as an environment variable.
+6. Never commit the real `DATABASE_URL`. It includes the database password. If it was pasted into chat or pushed anywhere public, rotate/reset it in Neon.
+
+For reviewers/judges, the repo is runnable without Neon because `.env.example` defaults to SQLite. Neon is only needed for the deployed Render environment.
 
 Render deployment:
 
@@ -44,6 +46,7 @@ Render deployment:
 5. Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 6. Add environment variable `DATABASE_URL` using the Neon SQLAlchemy URL.
 7. Add `ALLOWED_ORIGINS=*` for demo simplicity.
+8. Open `/health` after deploy. It should return `{ "status": "ok" }`.
 
 ## Flutter Setup
 
@@ -56,10 +59,13 @@ flutter run
 
 Use these API base URLs:
 
+- Fresh clone default: Android emulator local backend, `http://10.0.2.2:8000`
 - Android emulator: `API_BASE_URL=http://10.0.2.2:8000`
 - iOS simulator: `API_BASE_URL=http://localhost:8000`
 - Physical phone: `API_BASE_URL=http://<your-laptop-LAN-IP>:8000`
 - Render: `API_BASE_URL=https://<your-render-service>.onrender.com`
+
+The Flutter app has a safe fallback URL, so `.env` is optional. Use `.env` only when you need to point the app at a physical-device IP or the Render backend.
 
 ## API Schema
 
@@ -89,15 +95,22 @@ Flutter keeps business logic out of widgets by using a small API client and Rive
 
 ## Git Workflow
 
-Use one GitHub repo for the monorepo. Commit at least every 45 minutes:
+Use one GitHub repo for the monorepo. During the actual hackathon, commit at least every 45 minutes:
 
 ```bash
-git add quick_slot quick_slot_backend README.md
-git commit -m "Build QuickSlot booking API"
-git commit -m "Add Flutter venue and booking flow"
-git commit -m "Document setup and concurrency approach"
-git push origin main
+git commit -m "initialize flutter and backend projects"
+git commit -m "create postgres schema and seed data"
+git commit -m "implement venue and slot endpoints"
+git commit -m "implement booking endpoint with conflict handling"
+git commit -m "add riverpod architecture and api layer"
+git commit -m "build venue list and slot selection screens"
+git commit -m "implement booking flow and confirmations"
+git commit -m "add my bookings and cancellation support"
+git commit -m "add loading empty and error states"
+git commit -m "complete documentation and cleanup"
 ```
+
+Do not rewrite history just to fake these commits. From this point onward, make small real commits for each improvement.
 
 If Git shows a dubious ownership warning on this machine:
 

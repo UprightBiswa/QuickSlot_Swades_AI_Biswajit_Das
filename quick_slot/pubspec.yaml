@@ -1,12 +1,5 @@
 name: quick_slot
-description: QuickSlot, a premium sports venue booking application. The design follows Material 3 principles with a focus on clean hierarchy, modern card layouts, and intuitive interaction states.
-
-Key Features Delivered:
-Design System: A robust system named &quot;Agile Athlete&quot; using a primary blue (#2563EB) and secondary green (#10B981) palette, featuring Inter typography and 16-20px rounded corners for a startup-quality feel.
-Login Flow: A welcoming entry screen with user selection and brand-aligned branding.
-Venue Discovery: A comprehensive list view featuring detailed cards with ratings, availability counts, and sports-specific tagging.
-Detailed Booking: A venue detail screen with a horizontal date picker and a smart slot grid highlighting Available, Booked, and Selected states.
-Booking Management: A dedicated &quot;My Bookings&quot; screen for tracking upcoming games and a celebratory &quot;Booking Success&quot; state.
+description: QuickSlot, a sports venue slot booking application for the hiring hackathon.
 publish_to: "none"
 version: 1.0.0+1
 
@@ -82,8 +75,6 @@ dependencies:
   # Localization
   easy_localization: ^3.0.8
 
-  flutter_native_splash: ^2.4.7
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -106,5 +97,3 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/translations/
-    - .env
-

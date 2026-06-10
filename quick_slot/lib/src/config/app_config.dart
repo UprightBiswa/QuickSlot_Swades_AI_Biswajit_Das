@@ -41,6 +41,6 @@ class AppConfig {
   }
 
   static String _getBaseUrl() {
-    return dotenv.get('API_BASE_URL', fallback: '');
+    return dotenv.get('API_BASE_URL', fallback: 'http://10.0.2.2:8000');
   }
 }
