@@ -15,7 +15,7 @@ QuickSlot is a local-demo sports slot booking system built for the hiring hackat
 
 ## Backend Setup
 
-Local SQLite:
+Local backend with Neon PostgreSQL:
 
 ```bash
 cd quick_slot_backend
@@ -24,6 +24,13 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Put the Neon SQLAlchemy URL in `quick_slot_backend/.env`:
+
+```bash
+DATABASE_URL=postgresql://USER:PASSWORD@HOST/neondb?sslmode=require&channel_binding=require
+ALLOWED_ORIGINS=*
 ```
 
 Neon PostgreSQL:
@@ -35,7 +42,7 @@ Neon PostgreSQL:
 5. Copy the SQLAlchemy connection URL into `quick_slot_backend/.env` as `DATABASE_URL=...`, or paste it into Render as an environment variable.
 6. Never commit the real `DATABASE_URL`. It includes the database password. If it was pasted into chat or pushed anywhere public, rotate/reset it in Neon.
 
-For reviewers/judges, the repo is runnable without Neon because `.env.example` defaults to SQLite. Neon is only needed for the deployed Render environment.
+For reviewers/judges, the backend expects a PostgreSQL `DATABASE_URL`. For this project, use Neon locally and in Render.
 
 Render deployment:
 
@@ -59,18 +66,18 @@ flutter run
 
 Use these API base URLs:
 
-- Fresh clone default: Android emulator local backend, `http://10.0.2.2:8000`
+- Fresh clone default for this laptop/phone setup: `http://10.41.13.83:8000`
 - Android emulator: `API_BASE_URL=http://10.0.2.2:8000`
 - iOS simulator: `API_BASE_URL=http://localhost:8000`
-- Physical phone: `API_BASE_URL=http://<your-laptop-LAN-IP>:8000`
+- Physical phone: `API_BASE_URL=http://10.41.13.83:8000`
 - Render: `API_BASE_URL=https://<your-render-service>.onrender.com`
 
 The Flutter app has a safe fallback URL, so `.env` is optional. Use `.env` only when you need to point the app at a physical-device IP or the Render backend.
 
-For a physical Android phone, `10.0.2.2` will not work. Run `ipconfig`, copy your laptop's Wi-Fi IPv4 address, and set:
+For a physical Android phone, `10.0.2.2` will not work. Your current laptop Wi-Fi IPv4 address is `10.41.13.83`, so set:
 
 ```bash
-API_BASE_URL=http://192.168.x.x:8000
+API_BASE_URL=http://10.41.13.83:8000
 ```
 
 Keep the phone and laptop on the same Wi-Fi, and allow Python/Uvicorn through Windows Firewall.

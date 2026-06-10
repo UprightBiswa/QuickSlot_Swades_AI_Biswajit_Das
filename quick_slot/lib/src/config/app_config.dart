@@ -6,7 +6,7 @@ import '../imports/core_imports.dart';
 class AppConfig {
   AppConfig._();
 
-  static const defaultApiBaseUrl = 'http://10.0.2.2:8000';
+  static const defaultApiBaseUrl = 'http://10.41.13.83:8000';
   static late final Dio dio;
 
   static String get baseUrl => _getBaseUrl();
