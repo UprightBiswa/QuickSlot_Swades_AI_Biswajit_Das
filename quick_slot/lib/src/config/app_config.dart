@@ -5,7 +5,7 @@ import '../imports/core_imports.dart';
 class AppConfig {
   AppConfig._();
 
-  static const defaultApiBaseUrl = 'http://10.41.13.83:8000';
+  static const defaultApiBaseUrl = 'https://quickslot-booking-system.onrender.com';
   static late final Dio dio;
 
   static String get baseUrl => _getBaseUrl();

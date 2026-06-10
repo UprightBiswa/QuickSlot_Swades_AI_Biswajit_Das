@@ -69,12 +69,13 @@ flutter run
 
 The Flutter API base URL is currently a code constant in `AppConfig`:
 
-- Current physical phone setup: `http://10.41.13.83:8000`
+- Current production setup: `https://quickslot-booking-system.onrender.com`
+- Physical phone local backend: `http://10.41.13.83:8000`
 - Android emulator alternative: `http://10.0.2.2:8000`
 - iOS simulator alternative: `http://localhost:8000`
 - Render alternative: `https://<your-render-service>.onrender.com`
 
-Change `quick_slot/lib/src/config/app_config.dart` when switching between phone, emulator, or Render.
+Change `quick_slot/lib/src/config/app_config.dart` when switching between Render, phone, emulator, or local web testing.
 
 For a physical Android phone, `10.0.2.2` will not work. Your current laptop Wi-Fi IPv4 address is `10.41.13.83`, so the app uses:
 
