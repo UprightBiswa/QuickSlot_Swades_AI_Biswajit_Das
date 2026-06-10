@@ -1,0 +1,10 @@
+.env
+*.db
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+quick_slot/.env
+quick_slot_backend/.env
+quick_slot_backend/quickslot.db

@@ -6,14 +6,42 @@ import 'package:quick_slot/src/features/auth/presentation/screens/login_screen.d
 import 'package:quick_slot/src/features/auth/presentation/screens/signup_screen.dart';
 import 'package:quick_slot/src/features/auth/presentation/screens/forgot_password_screen.dart';
 
-import 'package:quick_slot/src/features/home/presentation/screens/home_page.dart';
 import 'package:quick_slot/src/features/onboarding/presentation/screens/onboarding_page.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/my_bookings_screen.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/user_select_screen.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/venue_detail_screen.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/venue_list_screen.dart';
 
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: AppRoutes.onboarding,
+  initialLocation: AppRoutes.userSelect,
   routes: <RouteBase>[
+    GoRoute(
+      path: AppRoutes.userSelect,
+      name: 'userSelect',
+      builder: (context, state) => const UserSelectScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.venues,
+      name: 'venues',
+      builder: (context, state) => const VenueListScreen(),
+      routes: [
+        GoRoute(
+          path: ':venueId',
+          name: 'venueDetail',
+          builder: (context, state) {
+            final venueId = int.parse(state.pathParameters['venueId']!);
+            return VenueDetailScreen(venueId: venueId);
+          },
+        ),
+      ],
+    ),
+    GoRoute(
+      path: AppRoutes.bookings,
+      name: 'bookings',
+      builder: (context, state) => const MyBookingsScreen(),
+    ),
     GoRoute(
       path: AppRoutes.onboarding,
       name: 'onboarding',
@@ -33,11 +61,6 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.forgotPassword,
       name: 'forgotPassword',
       builder: (context, state) => const ForgotPasswordScreen(),
-    ),
-    GoRoute(
-      path: AppRoutes.home,
-      name: 'home',
-      builder: (context, state) => const HomePage(),
     ),
   ],
 );

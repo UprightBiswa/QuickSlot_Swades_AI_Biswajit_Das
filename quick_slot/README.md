@@ -1,16 +1,17 @@
-# quick_slot
+# QuickSlot Flutter App
 
-Generated with the Flutter Scaffolding Wizard.
+Flutter client for the QuickSlot hackathon project.
 
-## What's inside
-- Opinionated theme with Material 3
-- Onboarding presentation starter
-- Routing scaffold using `go_router`
-- State: riverpod
-- Backend: custom
-
-## Getting started
 ```bash
 flutter pub get
+copy .env.example .env
 flutter run
 ```
+
+Set `API_BASE_URL` in `.env`:
+
+- Android emulator: `http://10.0.2.2:8000`
+- Physical phone: `http://<your-laptop-LAN-IP>:8000`
+- Render: `https://<your-render-service>.onrender.com`
+
+The app uses Riverpod for state management, GoRouter for navigation, and Dio for API calls.
