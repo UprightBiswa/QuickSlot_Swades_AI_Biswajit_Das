@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_api.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/providers/quickslot_providers.dart';
@@ -21,12 +22,18 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final venuesState = ref.watch(venuesProvider);
-    final slotsState = ref.watch(slotsProvider(widget.venueId));
-    final date = ref.watch(selectedDateProvider);
+    final venuesState = ref.watch<AsyncValue<List<Venue>>>(venuesProvider);
+    final slotsState = ref.watch<AsyncValue<List<Slot>>>(
+      slotsProvider(widget.venueId),
+    );
+    final date = ref.watch<DateTime>(selectedDateProvider);
 
     Venue? venue;
-    for (final item in venuesState.valueOrNull ?? <Venue>[]) {
+    final venues = venuesState.maybeWhen(
+      data: (items) => items,
+      orElse: () => <Venue>[],
+    );
+    for (final item in venues) {
       if (item.id == widget.venueId) {
         venue = item;
         break;
@@ -55,7 +62,8 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
                   }
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
@@ -67,7 +75,9 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
                       return _SlotTile(
                         slot: slot,
                         isLoading: _bookingSlotId == slot.id,
-                        onTap: slot.isAvailable ? () => _confirmBooking(slot) : null,
+                        onTap: slot.isAvailable
+                            ? () => _confirmBooking(slot)
+                            : null,
                       );
                     },
                   );
@@ -85,10 +95,15 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirm booking'),
-        content: Text('Book ${_hour(slot.startHour)} - ${_hour(slot.endHour)}?'),
+        content:
+            Text('Book ${_hour(slot.startHour)} - ${_hour(slot.endHour)}?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Book')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Book')),
         ],
       ),
     );
@@ -96,7 +111,7 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
       return;
     }
 
-    final user = ref.read(selectedUserProvider);
+    final user = ref.read<QuickUser?>(selectedUserProvider);
     if (user == null) {
       _showMessage('Select a user before booking.');
       return;
@@ -117,7 +132,9 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
       }
     } on DioException catch (error) {
       if (mounted) {
-        _showMessage(error.response?.data.toString() ?? error.message ?? 'Booking failed.');
+        _showMessage(error.response?.data.toString() ??
+            error.message ??
+            'Booking failed.');
       }
     } finally {
       if (mounted) {
@@ -127,7 +144,8 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _hour(int hour) {
@@ -168,11 +186,14 @@ class _DateStrip extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(index == 0 ? 'Today' : '${date.day}/${date.month}'),
-                  Text(_weekday(date), style: Theme.of(context).textTheme.labelSmall),
+                  Text(_weekday(date),
+                      style: Theme.of(context).textTheme.labelSmall),
                 ],
               ),
             ),
-            onSelected: (_) => ref.read(selectedDateProvider.notifier).state = date,
+            onSelected: (_) => ref
+                .read<StateController<DateTime>>(selectedDateProvider.notifier)
+                .state = date,
           );
         },
       ),
@@ -200,8 +221,12 @@ class _SlotTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final available = slot.isAvailable;
-    final background = available ? colorScheme.primaryContainer : colorScheme.surfaceContainerHighest;
-    final foreground = available ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant;
+    final background = available
+        ? colorScheme.primaryContainer
+        : colorScheme.surfaceContainerHighest;
+    final foreground = available
+        ? colorScheme.onPrimaryContainer
+        : colorScheme.onSurfaceVariant;
 
     return Material(
       color: background,
@@ -213,19 +238,22 @@ class _SlotTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             children: [
-              Icon(available ? Icons.check_circle_rounded : Icons.lock_rounded, color: foreground),
+              Icon(available ? Icons.check_circle_rounded : Icons.lock_rounded,
+                  color: foreground),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   '${_hour(slot.startHour)} - ${_hour(slot.endHour)}',
-                  style: TextStyle(color: foreground, fontWeight: FontWeight.w700),
+                  style:
+                      TextStyle(color: foreground, fontWeight: FontWeight.w700),
                 ),
               ),
               if (isLoading)
                 SizedBox(
                   height: 18,
                   width: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: foreground),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: foreground),
                 ),
             ],
           ),

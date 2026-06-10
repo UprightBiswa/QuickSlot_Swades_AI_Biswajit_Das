@@ -23,7 +23,6 @@ class App extends StatelessWidget {
       builder: (context, child) {
         Widget current = child!;
         current = SkeletonWrapper(child: current);
-        current = SessionListenerWrapper(child: current);
         return current;
       },
     );

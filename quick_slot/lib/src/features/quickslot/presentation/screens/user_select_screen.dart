@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/providers/quickslot_providers.dart';
 import 'package:quick_slot/src/routing/app_routes.dart';
 
@@ -20,16 +22,19 @@ class UserSelectScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 36),
-              Icon(Icons.sports_tennis_rounded, size: 52, color: colorScheme.primary),
+              Icon(Icons.sports_tennis_rounded,
+                  size: 52, color: colorScheme.primary),
               const SizedBox(height: 18),
               Text(
                 'QuickSlot',
-                style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800),
+                style: textTheme.displaySmall
+                    ?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
               Text(
                 'Pick a demo user to book courts and turfs.',
-                style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
+                style: textTheme.bodyLarge
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 32),
               Expanded(
@@ -41,12 +46,17 @@ class UserSelectScreen extends ConsumerWidget {
                     return Card(
                       margin: EdgeInsets.zero,
                       child: ListTile(
-                        leading: CircleAvatar(child: Text(user.name.characters.first)),
+                        leading: CircleAvatar(
+                            child: Text(user.name.characters.first)),
                         title: Text(user.name),
                         subtitle: Text('User id: ${user.id}'),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () {
-                          ref.read(selectedUserProvider.notifier).state = user;
+                          ref
+                              .read<StateController<QuickUser?>>(
+                                selectedUserProvider.notifier,
+                              )
+                              .state = user;
                           context.go(AppRoutes.venues);
                         },
                       ),

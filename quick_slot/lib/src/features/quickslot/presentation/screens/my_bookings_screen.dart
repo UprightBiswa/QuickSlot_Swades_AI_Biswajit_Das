@@ -18,7 +18,8 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bookingsState = ref.watch(bookingsProvider);
+    final bookingsState =
+        ref.watch<AsyncValue<List<Booking>>>(bookingsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Bookings')),
@@ -76,7 +77,7 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
   }
 
   Future<void> _cancel(Booking booking) async {
-    final user = ref.read(selectedUserProvider);
+    final user = ref.read<QuickUser?>(selectedUserProvider);
     if (user == null) {
       return;
     }
@@ -86,7 +87,8 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
       ref.invalidate(bookingsProvider);
       ref.invalidate(slotsProvider(booking.venueId));
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking cancelled.')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Booking cancelled.')));
       }
     } finally {
       if (mounted) {

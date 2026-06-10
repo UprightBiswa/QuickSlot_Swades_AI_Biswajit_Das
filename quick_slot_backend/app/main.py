@@ -1,5 +1,6 @@
 import logging
 import os
+from contextlib import asynccontextmanager
 from datetime import date
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response, status
@@ -15,7 +16,16 @@ from app.seed import ensure_slots_for_date, seed_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("quickslot")
 
-app = FastAPI(title="QuickSlot API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as db:
+        seed_data(db)
+    logger.info("QuickSlot API started")
+    yield
+
+
+app = FastAPI(title="QuickSlot API", version="1.0.0", lifespan=lifespan)
 
 origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", "*").split(",")]
 app.add_middleware(
@@ -25,14 +35,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    Base.metadata.create_all(bind=engine)
-    with SessionLocal() as db:
-        seed_data(db)
-    logger.info("QuickSlot API started")
 
 
 @app.get("/health")

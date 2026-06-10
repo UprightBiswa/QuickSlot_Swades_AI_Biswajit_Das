@@ -69,11 +69,17 @@ The Flutter app has a safe fallback URL, so `.env` is optional. Use `.env` only 
 
 ## API Schema
 
+- `GET /health` - health check for local/Render smoke testing
 - `GET /venues` - list venues
 - `GET /venues/{id}/slots?date=YYYY-MM-DD` - list venue slots with `available` or `booked`
 - `POST /bookings` - body `{ "slot_id": 1, "user_name": "Aarav" }`, header `X-User-Id`
 - `GET /users/{id}/bookings` - list bookings for one user
 - `DELETE /bookings/{id}` - cancel booking, header `X-User-Id`
+
+FastAPI also exposes:
+
+- `/docs` - interactive Swagger API preview
+- `/openapi.json` - OpenAPI schema
 
 Status codes:
 
@@ -88,6 +94,47 @@ Status codes:
 The backend protects slots at the database layer. `bookings.slot_id` is unique, so only one active booking row can exist for a slot. When two devices post to `/bookings` at the same time, both requests try to insert. PostgreSQL serializes the unique index check: one insert commits, the other raises an integrity error. The API catches that error, rolls back, and returns `409 Conflict` with a clear message.
 
 This is stronger than checking availability in Flutter or doing a separate "is slot free?" query before insert, because those approaches can race.
+
+## Verification
+
+Backend:
+
+```bash
+cd quick_slot_backend
+pip install -r requirements.txt
+pytest
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Flutter:
+
+```bash
+cd quick_slot
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+If `flutter` or `dart` hangs on this Windows machine, direct Dart analysis can still be checked with:
+
+```bash
+C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe analyze
+```
+
+If that prints `No issues found!` followed by a telemetry permission error under `AppData\Roaming\.dart-tool`, the code analysis passed and the local Dart telemetry file permissions need to be fixed separately.
+
+## CI
+
+GitHub Actions is configured in `.github/workflows/ci.yml`.
+
+On every push or pull request to `main`, it runs:
+
+- backend dependency install + `pytest`
+- Flutter `pub get`
+- Flutter `analyze`
+- Flutter `test`
+- Flutter debug APK build
 
 ## Architecture Note
 

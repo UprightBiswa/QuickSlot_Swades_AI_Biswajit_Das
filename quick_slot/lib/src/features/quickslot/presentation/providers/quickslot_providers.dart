@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_api.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
 
@@ -20,12 +21,12 @@ final venuesProvider = FutureProvider<List<Venue>>((ref) {
 });
 
 final slotsProvider = FutureProvider.family<List<Slot>, int>((ref, venueId) {
-  final date = ref.watch(selectedDateProvider);
+  final date = ref.watch<DateTime>(selectedDateProvider);
   return quickSlotApi.getSlots(venueId: venueId, date: date);
 });
 
 final bookingsProvider = FutureProvider<List<Booking>>((ref) {
-  final user = ref.watch(selectedUserProvider);
+  final user = ref.watch<QuickUser?>(selectedUserProvider);
   if (user == null) {
     return const [];
   }
