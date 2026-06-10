@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quick_slot/src/config/app_config.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/providers/quickslot_providers.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/widgets/quickslot_bottom_nav.dart';
 import 'package:quick_slot/src/routing/app_routes.dart';
 import 'package:quick_slot/src/shared/widgets/app_empty_state.dart';
 import 'package:quick_slot/src/shared/widgets/app_error_widget.dart';
@@ -13,7 +15,8 @@ class VenueListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final venuesState = ref.watch<AsyncValue<List<Venue>>>(venuesProvider);
+    final venuesState =
+        ref.watch<AsyncValue<List<Venue>>>(filteredVenuesProvider);
     final user = ref.watch<QuickUser?>(selectedUserProvider);
 
     return Scaffold(
@@ -27,6 +30,7 @@ class VenueListScreen extends ConsumerWidget {
           ),
         ],
       ),
+      bottomNavigationBar: const QuickSlotBottomNav(currentIndex: 0),
       body: SafeArea(
         child: venuesState.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -51,6 +55,23 @@ class VenueListScreen extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
                   _Header(userName: user?.name ?? 'guest'),
+                  const SizedBox(height: 16),
+                  TextField(
+                    onChanged: (value) => ref
+                        .read<StateController<String>>(
+                          venueSearchProvider.notifier,
+                        )
+                        .state = value,
+                    decoration: InputDecoration(
+                      hintText: 'Search by venue, sport or location',
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [

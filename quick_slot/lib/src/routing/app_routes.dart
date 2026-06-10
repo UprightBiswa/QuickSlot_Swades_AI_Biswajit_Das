@@ -10,6 +10,8 @@ abstract final class AppRoutes {
   static const String userSelect = '/';
   static const String venues = '/venues';
   static const String bookings = '/bookings';
+  static const String bookingSuccess = '/booking-success';
+  static const String profile = '/profile';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String signup = '/signup';

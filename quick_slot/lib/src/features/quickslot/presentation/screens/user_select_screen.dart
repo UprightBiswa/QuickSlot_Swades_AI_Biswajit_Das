@@ -15,6 +15,7 @@ class UserSelectScreen extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -22,11 +23,19 @@ class UserSelectScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 36),
-              Icon(Icons.sports_tennis_rounded,
-                  size: 52, color: colorScheme.primary),
+              Container(
+                width: 68,
+                height: 68,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Image.asset('assets/images/logo.png'),
+              ),
               const SizedBox(height: 18),
               Text(
-                'QuickSlot',
+                'Welcome to QuickSlot',
                 style: textTheme.displaySmall
                     ?.copyWith(fontWeight: FontWeight.w800),
               ),
@@ -37,6 +46,13 @@ class UserSelectScreen extends ConsumerWidget {
                     ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 32),
+              Text(
+                'Choose demo user',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 12),
               Expanded(
                 child: ListView.separated(
                   itemCount: demoUsers.length,
@@ -47,9 +63,17 @@ class UserSelectScreen extends ConsumerWidget {
                       margin: EdgeInsets.zero,
                       child: ListTile(
                         leading: CircleAvatar(
-                            child: Text(user.name.characters.first)),
+                          backgroundColor: colorScheme.primaryContainer,
+                          child: Text(
+                            user.name.characters.first,
+                            style: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
                         title: Text(user.name),
-                        subtitle: Text('User id: ${user.id}'),
+                        subtitle: const Text('Tap to continue'),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () {
                           ref

@@ -7,16 +7,24 @@ import 'package:quick_slot/src/features/auth/presentation/screens/signup_screen.
 import 'package:quick_slot/src/features/auth/presentation/screens/forgot_password_screen.dart';
 
 import 'package:quick_slot/src/features/onboarding/presentation/screens/onboarding_page.dart';
+import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/booking_success_screen.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/screens/my_bookings_screen.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/profile_screen.dart';
+import 'package:quick_slot/src/features/quickslot/presentation/screens/splash_screen.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/screens/user_select_screen.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/screens/venue_detail_screen.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/screens/venue_list_screen.dart';
 
-
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: AppRoutes.userSelect,
+  initialLocation: AppRoutes.splash,
   routes: <RouteBase>[
+    GoRoute(
+      path: AppRoutes.splash,
+      name: 'splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: AppRoutes.userSelect,
       name: 'userSelect',
@@ -41,6 +49,19 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.bookings,
       name: 'bookings',
       builder: (context, state) => const MyBookingsScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.bookingSuccess,
+      name: 'bookingSuccess',
+      builder: (context, state) {
+        final booking = state.extra as Booking?;
+        return BookingSuccessScreen(booking: booking);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.profile,
+      name: 'profile',
+      builder: (context, state) => const ProfileScreen(),
     ),
     GoRoute(
       path: AppRoutes.onboarding,

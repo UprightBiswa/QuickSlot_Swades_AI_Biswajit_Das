@@ -60,24 +60,22 @@ Render deployment:
 ```bash
 cd quick_slot
 flutter pub get
-copy .env.example .env
 flutter run
 ```
 
-Use these API base URLs:
+The Flutter API base URL is currently a code constant in `AppConfig`:
 
-- Fresh clone default for this laptop/phone setup: `http://10.41.13.83:8000`
-- Android emulator: `API_BASE_URL=http://10.0.2.2:8000`
-- iOS simulator: `API_BASE_URL=http://localhost:8000`
-- Physical phone: `API_BASE_URL=http://10.41.13.83:8000`
-- Render: `API_BASE_URL=https://<your-render-service>.onrender.com`
+- Current physical phone setup: `http://10.41.13.83:8000`
+- Android emulator alternative: `http://10.0.2.2:8000`
+- iOS simulator alternative: `http://localhost:8000`
+- Render alternative: `https://<your-render-service>.onrender.com`
 
-The Flutter app has a safe fallback URL, so `.env` is optional. Use `.env` only when you need to point the app at a physical-device IP or the Render backend.
+Change `quick_slot/lib/src/config/app_config.dart` when switching between phone, emulator, or Render.
 
-For a physical Android phone, `10.0.2.2` will not work. Your current laptop Wi-Fi IPv4 address is `10.41.13.83`, so set:
+For a physical Android phone, `10.0.2.2` will not work. Your current laptop Wi-Fi IPv4 address is `10.41.13.83`, so the app uses:
 
 ```bash
-API_BASE_URL=http://10.41.13.83:8000
+http://10.41.13.83:8000
 ```
 
 Keep the phone and laptop on the same Wi-Fi, and allow Python/Uvicorn through Windows Firewall.
@@ -143,7 +141,7 @@ C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe analyze
 
 If that prints `No issues found!` followed by a telemetry permission error under `AppData\Roaming\.dart-tool`, the code analysis passed and the local Dart telemetry file permissions need to be fixed separately.
 
-Neon note: if local Uvicorn fails with `psycopg2.OperationalError` and Windows error `10013 Permission denied` while connecting to port `5432`, your machine/network is blocking outbound PostgreSQL. Use SQLite locally for the demo rehearsal or unblock Python/PostgreSQL traffic in firewall/security software. Render should still use Neon via the `DATABASE_URL` environment variable.
+Neon note: if local Uvicorn fails with `psycopg2.OperationalError` and Windows error `10013 Permission denied` while connecting to port `5432`, your machine/network is blocking outbound PostgreSQL. Unblock Python/PostgreSQL traffic in firewall/security software, or deploy the backend to Render with Neon via the `DATABASE_URL` environment variable.
 
 ## CI
 

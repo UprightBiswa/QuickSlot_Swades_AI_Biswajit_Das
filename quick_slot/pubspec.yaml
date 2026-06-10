@@ -51,9 +51,6 @@ dependencies:
   flutter_animate: ^4.5.2
   smooth_page_indicator: ^2.0.1
 
-  # Environment
-  flutter_dotenv: ^6.0.0
-
   # Logging
   logger: ^2.6.2
 

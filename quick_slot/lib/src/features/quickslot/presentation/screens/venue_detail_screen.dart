@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_api.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
 import 'package:quick_slot/src/features/quickslot/presentation/providers/quickslot_providers.dart';
+import 'package:quick_slot/src/routing/app_routes.dart';
 import 'package:quick_slot/src/shared/widgets/app_empty_state.dart';
 import 'package:quick_slot/src/shared/widgets/app_error_widget.dart';
 
@@ -121,11 +123,11 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
 
     setState(() => _bookingSlotId = slot.id);
     try {
-      await quickSlotApi.createBooking(slot: slot, user: user);
+      final booking = await quickSlotApi.createBooking(slot: slot, user: user);
       ref.invalidate(slotsProvider(widget.venueId));
       ref.invalidate(bookingsProvider);
       if (mounted) {
-        _showMessage('Booked successfully.');
+        context.push(AppRoutes.bookingSuccess, extra: booking);
       }
     } on SlotTakenException catch (error) {
       ref.invalidate(slotsProvider(widget.venueId));

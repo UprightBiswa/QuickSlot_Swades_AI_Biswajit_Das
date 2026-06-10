@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../imports/core_imports.dart';
 
@@ -49,6 +48,6 @@ class AppConfig {
   }
 
   static String _getBaseUrl() {
-    return dotenv.get('API_BASE_URL', fallback: defaultApiBaseUrl);
+    return defaultApiBaseUrl;
   }
 }
