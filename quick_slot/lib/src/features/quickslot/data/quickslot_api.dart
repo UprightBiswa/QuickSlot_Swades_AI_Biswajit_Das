@@ -2,6 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:quick_slot/src/config/app_config.dart';
 import 'package:quick_slot/src/features/quickslot/data/quickslot_models.dart';
 
+class QuickSlotApiException implements Exception {
+  const QuickSlotApiException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 class SlotTakenException implements Exception {
   const SlotTakenException(this.message);
 
@@ -17,20 +26,29 @@ class QuickSlotApi {
   final Dio _dio;
 
   Future<List<Venue>> getVenues() async {
-    final response = await _dio.get<List<dynamic>>('/venues');
-    return response.data!
-        .map((item) => Venue.fromJson(item as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.get<List<dynamic>>('/venues');
+      return response.data!
+          .map((item) => Venue.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (error) {
+      throw QuickSlotApiException(_friendlyError(error));
+    }
   }
 
-  Future<List<Slot>> getSlots({required int venueId, required DateTime date}) async {
-    final response = await _dio.get<List<dynamic>>(
-      '/venues/$venueId/slots',
-      queryParameters: {'date': _dateOnly(date)},
-    );
-    return response.data!
-        .map((item) => Slot.fromJson(item as Map<String, dynamic>))
-        .toList();
+  Future<List<Slot>> getSlots(
+      {required int venueId, required DateTime date}) async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        '/venues/$venueId/slots',
+        queryParameters: {'date': _dateOnly(date)},
+      );
+      return response.data!
+          .map((item) => Slot.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (error) {
+      throw QuickSlotApiException(_friendlyError(error));
+    }
   }
 
   Future<Booking> createBooking({
@@ -52,22 +70,31 @@ class QuickSlotApi {
             : 'This slot was just booked.';
         throw SlotTakenException(message);
       }
-      rethrow;
+      throw QuickSlotApiException(_friendlyError(error));
     }
   }
 
   Future<List<Booking>> getUserBookings(String userId) async {
-    final response = await _dio.get<List<dynamic>>('/users/$userId/bookings');
-    return response.data!
-        .map((item) => Booking.fromJson(item as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await _dio.get<List<dynamic>>('/users/$userId/bookings');
+      return response.data!
+          .map((item) => Booking.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (error) {
+      throw QuickSlotApiException(_friendlyError(error));
+    }
   }
 
-  Future<void> cancelBooking({required int bookingId, required QuickUser user}) async {
-    await _dio.delete<void>(
-      '/bookings/$bookingId',
-      options: Options(headers: {'X-User-Id': user.id}),
-    );
+  Future<void> cancelBooking(
+      {required int bookingId, required QuickUser user}) async {
+    try {
+      await _dio.delete<void>(
+        '/bookings/$bookingId',
+        options: Options(headers: {'X-User-Id': user.id}),
+      );
+    } on DioException catch (error) {
+      throw QuickSlotApiException(_friendlyError(error));
+    }
   }
 
   String _dateOnly(DateTime date) {
@@ -75,6 +102,20 @@ class QuickSlotApi {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
     return '$year-$month-$day';
+  }
+
+  String _friendlyError(DioException error) {
+    if (error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.receiveTimeout ||
+        error.type == DioExceptionType.connectionError) {
+      return 'Cannot reach QuickSlot API at ${AppConfig.baseUrl}. Use 10.0.2.2 for Android emulator, or your laptop IP for a real phone.';
+    }
+
+    final data = error.response?.data;
+    if (data is Map<String, dynamic> && data['detail'] != null) {
+      return data['detail'].toString();
+    }
+    return error.message ?? 'QuickSlot API request failed.';
   }
 }
 

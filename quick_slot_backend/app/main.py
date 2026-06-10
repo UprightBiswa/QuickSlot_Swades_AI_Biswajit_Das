@@ -42,21 +42,40 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/")
+def api_preview() -> dict[str, str]:
+    return {
+        "name": "QuickSlot API",
+        "health": "/health",
+        "venues": "/venues",
+        "docs": "/docs",
+    }
+
+
 @app.get("/venues", response_model=list[VenueOut])
 def list_venues(db: Session = Depends(get_db)) -> list[Venue]:
     return db.query(Venue).order_by(Venue.name).all()
 
 
+@app.get("/venues/{venue_id}", response_model=VenueOut)
+def get_venue(venue_id: int, db: Session = Depends(get_db)) -> Venue:
+    venue = db.get(Venue, venue_id)
+    if venue is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Venue not found")
+    return venue
+
+
 @app.get("/venues/{venue_id}/slots", response_model=list[SlotOut])
 def list_slots(
     venue_id: int,
-    date_: date = Query(alias="date"),
+    date_: date | None = Query(default=None, alias="date"),
     db: Session = Depends(get_db),
 ) -> list[SlotOut]:
     venue = db.get(Venue, venue_id)
     if venue is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Venue not found")
 
+    date_ = date_ or date.today()
     ensure_slots_for_date(db, date_)
     slots = (
         db.query(Slot)

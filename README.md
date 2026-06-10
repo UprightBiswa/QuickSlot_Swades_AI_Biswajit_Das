@@ -67,10 +67,20 @@ Use these API base URLs:
 
 The Flutter app has a safe fallback URL, so `.env` is optional. Use `.env` only when you need to point the app at a physical-device IP or the Render backend.
 
+For a physical Android phone, `10.0.2.2` will not work. Run `ipconfig`, copy your laptop's Wi-Fi IPv4 address, and set:
+
+```bash
+API_BASE_URL=http://192.168.x.x:8000
+```
+
+Keep the phone and laptop on the same Wi-Fi, and allow Python/Uvicorn through Windows Firewall.
+
 ## API Schema
 
 - `GET /health` - health check for local/Render smoke testing
+- `GET /` - small API preview
 - `GET /venues` - list venues
+- `GET /venues/{id}` - venue detail
 - `GET /venues/{id}/slots?date=YYYY-MM-DD` - list venue slots with `available` or `booked`
 - `POST /bookings` - body `{ "slot_id": 1, "user_name": "Aarav" }`, header `X-User-Id`
 - `GET /users/{id}/bookings` - list bookings for one user
@@ -80,6 +90,8 @@ FastAPI also exposes:
 
 - `/docs` - interactive Swagger API preview
 - `/openapi.json` - OpenAPI schema
+
+The slots endpoint accepts `date`; if it is omitted during manual browser testing, the backend defaults to today.
 
 Status codes:
 
@@ -123,6 +135,8 @@ C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe analyze
 ```
 
 If that prints `No issues found!` followed by a telemetry permission error under `AppData\Roaming\.dart-tool`, the code analysis passed and the local Dart telemetry file permissions need to be fixed separately.
+
+Neon note: if local Uvicorn fails with `psycopg2.OperationalError` and Windows error `10013 Permission denied` while connecting to port `5432`, your machine/network is blocking outbound PostgreSQL. Use SQLite locally for the demo rehearsal or unblock Python/PostgreSQL traffic in firewall/security software. Render should still use Neon via the `DATABASE_URL` environment variable.
 
 ## CI
 

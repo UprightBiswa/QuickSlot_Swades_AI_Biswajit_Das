@@ -45,7 +45,9 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            if (venue != null) _VenueSummary(venue: venue),
             _DateStrip(selectedDate: date),
+            const _SlotLegend(),
             Expanded(
               child: slotsState.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -155,6 +157,84 @@ class _VenueDetailScreenState extends ConsumerState<VenueDetailScreen> {
   }
 }
 
+class _VenueSummary extends StatelessWidget {
+  const _VenueSummary({required this.venue});
+
+  final Venue venue;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: colorScheme.onPrimary.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(_sportIcon(venue.sport), color: colorScheme.onPrimary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  venue.name,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${venue.sport} • Rs ${venue.pricePerHour}/hr',
+                  style: TextStyle(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.82),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.star_rounded, color: colorScheme.onPrimary, size: 18),
+              const SizedBox(width: 3),
+              Text(
+                venue.rating,
+                style: TextStyle(
+                  color: colorScheme.onPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _sportIcon(String sport) {
+    return switch (sport) {
+      'Badminton' => Icons.sports_tennis_rounded,
+      'Football Turf' => Icons.sports_soccer_rounded,
+      'Cricket Turf' => Icons.sports_cricket_rounded,
+      _ => Icons.sports_rounded,
+    };
+  }
+}
+
 class _DateStrip extends ConsumerWidget {
   const _DateStrip({required this.selectedDate});
 
@@ -210,6 +290,58 @@ class _DateStrip extends ConsumerWidget {
   }
 }
 
+class _SlotLegend extends StatelessWidget {
+  const _SlotLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Row(
+        children: [
+          Text(
+            'Available Slots',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w900),
+          ),
+          const Spacer(),
+          const _LegendDot(color: Color(0xFF10B981), label: 'Free'),
+          const SizedBox(width: 10),
+          _LegendDot(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            label: 'Booked',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegendDot extends StatelessWidget {
+  const _LegendDot({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 5),
+        Text(label, style: Theme.of(context).textTheme.labelMedium),
+      ],
+    );
+  }
+}
+
 class _SlotTile extends StatelessWidget {
   const _SlotTile({required this.slot, required this.isLoading, this.onTap});
 
@@ -222,11 +354,9 @@ class _SlotTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final available = slot.isAvailable;
     final background = available
-        ? colorScheme.primaryContainer
+        ? const Color(0xFF10B981)
         : colorScheme.surfaceContainerHighest;
-    final foreground = available
-        ? colorScheme.onPrimaryContainer
-        : colorScheme.onSurfaceVariant;
+    final foreground = available ? Colors.white : colorScheme.onSurfaceVariant;
 
     return Material(
       color: background,

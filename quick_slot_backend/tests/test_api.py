@@ -5,6 +5,7 @@ from pathlib import Path
 
 os.environ["DATABASE_URL"] = "sqlite:///./test_quickslot.db"
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+Path("test_quickslot.db").unlink(missing_ok=True)
 
 from fastapi.testclient import TestClient
 
@@ -17,12 +18,26 @@ def test_core_booking_flow_blocks_double_booking():
         assert health.status_code == 200
         assert health.json()["status"] == "ok"
 
+        preview = client.get("/")
+        assert preview.status_code == 200
+        assert preview.json()["venues"] == "/venues"
+
         venues = client.get("/venues")
         assert venues.status_code == 200
         assert len(venues.json()) >= 3
 
         venue_id = venues.json()[0]["id"]
-        slots = client.get(f"/venues/{venue_id}/slots", params={"date": date.today().isoformat()})
+        venue_detail = client.get(f"/venues/{venue_id}")
+        assert venue_detail.status_code == 200
+        assert venue_detail.json()["id"] == venue_id
+
+        slots_without_date = client.get(f"/venues/{venue_id}/slots")
+        assert slots_without_date.status_code == 200
+
+        slots = client.get(
+            f"/venues/{venue_id}/slots",
+            params={"date": date.today().isoformat()},
+        )
         assert slots.status_code == 200
         assert len(slots.json()) == 16
 
