@@ -47,13 +47,17 @@ For reviewers/judges, the backend expects a PostgreSQL `DATABASE_URL`. For this 
 Render deployment:
 
 1. Push this monorepo to GitHub.
-2. In Render, create a new Web Service from the GitHub repo.
+2. In Render, create a new Web Service from the GitHub repo and deploy the latest `main` commit.
 3. Set Root Directory: `quick_slot_backend`.
-4. Build Command: `pip install -r requirements.txt`.
-5. Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
-6. Add environment variable `DATABASE_URL` using the Neon SQLAlchemy URL.
-7. Add `ALLOWED_ORIGINS=*` for demo simplicity.
-8. Open `/health` after deploy. It should return `{ "status": "ok" }`.
+4. Set Python version to `3.12.10`. The repo includes both `quick_slot_backend/runtime.txt` and `quick_slot_backend/.python-version` for this.
+5. Build Command: `python -m pip install --upgrade pip && pip install -r requirements.txt`.
+6. Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+7. Add environment variable `DATABASE_URL` using the Neon SQLAlchemy URL.
+8. Add `ALLOWED_ORIGINS=*` for demo simplicity.
+9. Add `PYTHON_VERSION=3.12.10` if Render still tries Python 3.14.
+10. Open `/health` after deploy. It should return `{ "status": "ok" }`.
+
+If Render logs show Python `3.14.x`, the service is using the wrong runtime. Redeploy after pushing this commit, or set `PYTHON_VERSION=3.12.10` manually in Render environment variables.
 
 ## Flutter Setup
 
@@ -118,7 +122,7 @@ Backend:
 
 ```bash
 cd quick_slot_backend
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 pytest
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -161,28 +165,8 @@ Flutter keeps business logic out of widgets by using a small API client and Rive
 
 ## Git Workflow
 
-Use one GitHub repo for the monorepo. During the actual hackathon, commit at least every 45 minutes:
+Use one GitHub repo for the monorepo.
 
-```bash
-git commit -m "initialize flutter and backend projects"
-git commit -m "create postgres schema and seed data"
-git commit -m "implement venue and slot endpoints"
-git commit -m "implement booking endpoint with conflict handling"
-git commit -m "add riverpod architecture and api layer"
-git commit -m "build venue list and slot selection screens"
-git commit -m "implement booking flow and confirmations"
-git commit -m "add my bookings and cancellation support"
-git commit -m "add loading empty and error states"
-git commit -m "complete documentation and cleanup"
-```
-
-Do not rewrite history just to fake these commits. From this point onward, make small real commits for each improvement.
-
-If Git shows a dubious ownership warning on this machine:
-
-```bash
-git config --global --add safe.directory D:/assignment/AI_AS
-```
 
 ## Scope Cuts
 
